@@ -13,6 +13,7 @@ Kafka is good for low-latency applications.
 Simple one node + fast consumer scenario
 Slow consumer scenario to trigger disk writes
 latencies on node failovers
+durable vs non-durable
 
 
 Every time I see an ExecutorService with 400 threads, I have that "it's
@@ -264,7 +265,7 @@ be instrumented (changed). This is why if you try to launch tests
 directly via IntelliJ IDEA, Eclipse or other JUnit runner you will get
 ```
 java.lang.IllegalArgumentException: Fiber class
-com.romanmarkunas.blog.fibers.intro.server.SlowApplicationTest$1 has
+SlowApplicationTest$1 has
 not been instrumented.
 ```
 

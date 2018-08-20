@@ -1,23 +1,18 @@
 apply plugin: 'java'
 
 repositories {
-    jcenter()
     maven { url "http://maven-repo2.iggroup.local:8081/nexus/content/groups/public" }
-}
-
-configurations {
-    quasar
+//    jcenter()
 }
 
 dependencies {
-    compile 'io.dropwizard:dropwizard-core:1.2.2'
-    testCompile 'junit:junit:4.12'
-    testCompile 'io.dropwizard:dropwizard-testing:1.2.2'
-    testCompile 'co.paralleluniverse:comsat-jax-rs-client:0.7.0'
-    testCompile 'co.paralleluniverse:quasar-core:0.7.0'
-    quasar 'co.paralleluniverse:quasar-core:0.7.0'
-}
+    compile 'org.apache.kafka:kafka-clients:2.0.0'
+    compile 'org.apache.activemq:artemis-jms-client:2.6.2'
+    compile 'org.apache.activemq:artemis-core-client:2.6.2'
 
-test {
-    jvmArgs "-javaagent:${configurations.quasar.iterator().next()}"
+    compile 'io.dropwizard:dropwizard-core:1.2.2'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'io.dropwizard:dropwizard-testing:1.2.2'
 }
