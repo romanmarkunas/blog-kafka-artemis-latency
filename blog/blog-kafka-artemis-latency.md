@@ -14,6 +14,9 @@ Simple one node + fast consumer scenario
 Slow consumer scenario to trigger disk writes
 latencies on node failovers
 durable vs non-durable
+commit at read and replication at write impact
+
+5 rides
 
 
 Every time I see an ExecutorService with 400 threads, I have that "it's
