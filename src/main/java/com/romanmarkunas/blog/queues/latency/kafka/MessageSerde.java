@@ -9,7 +9,6 @@ import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class MessageSerde extends EmptyCloseAndConfigure implements Serde<Message> {
 
@@ -56,7 +55,3 @@ public class MessageSerde extends EmptyCloseAndConfigure implements Serde<Messag
     }
 }
 
-class EmptyCloseAndConfigure {
-    public void close() {}
-    public void configure(Map<String, ?> configs, boolean isKey) {}
-}

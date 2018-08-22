@@ -3,11 +3,12 @@ package com.romanmarkunas.blog.queues.latency.kafka;
 import com.romanmarkunas.blog.queues.latency.Message;
 import com.romanmarkunas.blog.queues.latency.MessageReceiver;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 
@@ -24,16 +25,18 @@ public class KafkaMessageReceiver implements MessageReceiver, AutoCloseable {
 
 
     @Override
-    public List<Message> receiveMessages() {
+    public Optional<Message> receiveMessage() {
         ConsumerRecords<String, Message> consumerRecords
-                = this.consumer.poll(Duration.of(1, MILLIS));
+                = this.consumer.poll(Duration.of(10, MILLIS));
+        Iterator<ConsumerRecord<String, Message>> recordIterator
+                = consumerRecords.records(this.topic).iterator();
 
-        List<Message> messages = new ArrayList<>();
-        consumerRecords
-                .records(this.topic)
-                .forEach(record -> messages.add(record.value()));
-
-        return messages;
+        if (!recordIterator.hasNext()) {
+            return Optional.empty();
+        }
+        else {
+            return Optional.of(recordIterator.next().value());
+        }
     }
 
     @Override

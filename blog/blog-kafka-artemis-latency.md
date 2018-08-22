@@ -16,7 +16,7 @@ latencies on node failovers
 durable vs non-durable
 commit at read and replication at write impact
 
-5 rides
+6 rides + 1.5
 
 
 Every time I see an ExecutorService with 400 threads, I have that "it's

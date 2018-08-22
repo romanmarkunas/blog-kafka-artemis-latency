@@ -1,7 +1,7 @@
 package com.romanmarkunas.blog.queues.latency;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface MessageReceiver {
-    List<Message> receiveMessages();
+    Optional<Message> receiveMessage();
 }
