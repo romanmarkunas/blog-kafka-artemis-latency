@@ -1,4 +1,4 @@
-package com.romanmarkunas.blog.queues.latency.latency_test;
+package com.romanmarkunas.blog.queues.latency;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.SlidingWindowReservoir;
@@ -10,7 +10,6 @@ import com.romanmarkunas.blog.queues.latency.StringGenerator;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.apache.activemq.artemis.api.core.client.ServerLocator;
-import org.apache.activemq.artemis.uri.schema.connector.InVMTransportConfigurationSchema;
 import org.junit.Test;
 
 import java.util.Optional;

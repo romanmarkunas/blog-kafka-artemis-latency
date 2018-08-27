@@ -1,8 +1,9 @@
 apply plugin: 'java'
 
 repositories {
-    maven { url "http://maven-repo2.iggroup.local:8081/nexus/content/groups/public" }
-//    jcenter()
+//    maven { url "http://maven-repo2.iggroup.local:8081/nexus/content/groups/public" }
+    maven { url 'https://dl.bintray.com/palantir/releases' }
+    jcenter()
 }
 
 dependencies {
@@ -15,4 +16,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'io.dropwizard:dropwizard-testing:1.2.2'
+    testCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.34.0'
 }
