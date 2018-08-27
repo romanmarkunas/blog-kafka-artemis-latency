@@ -35,7 +35,7 @@ public class LatencyMeasurement {
         this.sender = sender;
         this.receiver = receiver;
         this.generator = generator;
-        this.latencies = new Histogram(new SlidingWindowReservoir(messagesToSend));
+        this.latencies = new Histogram(new SlidingWindowReservoir(2 * messagesToSend));
     }
 
 
@@ -48,12 +48,23 @@ public class LatencyMeasurement {
 
 
     private Runnable send() {
-        return runUntilDoneOrFailed(() -> {
+//        return runUntilDoneOrFailed(() -> {
+//            for (int i = 0; i < this.messagesToSend; i++) {
+//                Message message = new Message(this.generator.next());
+//                this.sender.sendMessage(message);
+//            }
+//        });
+        return () -> {
             for (int i = 0; i < this.messagesToSend; i++) {
                 Message message = new Message(this.generator.next());
                 this.sender.sendMessage(message);
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        });
+        };
     }
 
     private Runnable receive() {
@@ -71,6 +82,7 @@ public class LatencyMeasurement {
                 long latency = System.currentTimeMillis() - message.getCreationTime();
                 this.latencies.update(latency);
             }
+            System.out.println("MESSAGES RECEIVED: " + messagesReceived);
         });
     }
 
@@ -78,7 +90,11 @@ public class LatencyMeasurement {
         return () -> {
             try {
                 code.run();
-            } finally {
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
                 this.executionFinished.set(true);
             }
         };

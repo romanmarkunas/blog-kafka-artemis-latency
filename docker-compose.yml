@@ -1,0 +1,29 @@
+version: "3.2"
+services:
+  zookeeper:
+    image: blacktop/kafka:latest
+    ports:
+      - "2182:2182"
+    volumes:
+      - type: 'bind'
+        source: ./src
+        target: /opt/kafka/configuration
+        bind:
+          propagation: shared
+#    command: "zookeeper-server-start.sh config/zookeeper.properties"
+    command: "zookeeper-server-start.sh configuration/zookeeper.properties"
+
+#  kafka-broker:
+#    image: blacktop/kafka:latest
+#    ports:
+#      - 9092
+#    volumes:
+#      - ./src/test/resources/configuration:/opt/kafka/configuration
+
+#volumes:
+#  configuration:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      device: ./src/test/resources/configuration
+#      o: bind

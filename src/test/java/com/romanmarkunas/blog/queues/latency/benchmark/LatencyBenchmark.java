@@ -11,9 +11,9 @@ public class LatencyBenchmark {
 //                            "org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory"));
 
     @Test
-    public void send_10000_256bytes_unlimitedRate_fastConsumerDurableMessages() throws InterruptedException {
+    public void send_10000_256bytes_unlimitedRate() {
         new LatencyMeasurement(
-                10_000,
+                5_000,
                 KafkaClients.defaultSender(),
                 KafkaClients.defaultReceiver(),
                 new StringGenerator(StringGenerator.ALPHANUM, 128)

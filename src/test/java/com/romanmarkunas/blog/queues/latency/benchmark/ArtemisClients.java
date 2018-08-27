@@ -16,7 +16,7 @@ import static java.util.Collections.singletonList;
 
 public class ArtemisClients {
 
-    public static void
+//    public static void
 
     private ArtemisClients() {}
 

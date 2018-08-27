@@ -7,7 +7,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
@@ -16,6 +18,7 @@ public class KafkaMessageReceiver implements MessageReceiver, AutoCloseable {
 
     private final Consumer<String, Message> consumer;
     private final String topic;
+    private final List<Message> prefetchBuffer = new ArrayList<>();
 
 
     public KafkaMessageReceiver(Consumer<String, Message> consumer, String topic) {
@@ -26,16 +29,25 @@ public class KafkaMessageReceiver implements MessageReceiver, AutoCloseable {
 
     @Override
     public Optional<Message> receiveMessage() {
-        ConsumerRecords<String, Message> consumerRecords
-                = this.consumer.poll(Duration.of(10, MILLIS));
-        Iterator<ConsumerRecord<String, Message>> recordIterator
-                = consumerRecords.records(this.topic).iterator();
+        if (this.prefetchBuffer.isEmpty()) {
+            ConsumerRecords<String, Message> consumerRecords
+                    = this.consumer.poll(Duration.of(10, MILLIS));
+            Iterator<ConsumerRecord<String, Message>> recordIterator
+                    = consumerRecords.records(this.topic).iterator();
 
-        if (!recordIterator.hasNext()) {
-            return Optional.empty();
+            if (!recordIterator.hasNext()) {
+                return Optional.empty();
+            }
+            else {
+                Message returningNow = recordIterator.next().value();
+                while (recordIterator.hasNext()) {
+                    this.prefetchBuffer.add(recordIterator.next().value());
+                }
+                return Optional.of(returningNow);
+            }
         }
         else {
-            return Optional.of(recordIterator.next().value());
+            return Optional.of(this.prefetchBuffer.remove(0));
         }
     }
 
