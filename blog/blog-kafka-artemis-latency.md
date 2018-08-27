@@ -6,28 +6,38 @@ not expected and it was "because Kafka is designed for throughput and not
 latency". After quick Google'ing I found [this outdated SO question](TODO link).
 That question is very old and includes very old version of Kafka (TODO add current version vs old)
 and also [this article](TODO link) states that very decent latencies (2-3ms 99 
-percentile) are achievable. Having this much info is not enough to make final
-decision so I decided to create a little benchmark, to finally conclude whether
+percentile) are achievable. Having such controversial info is not enough to make final
+decision so I decided to create a little benchmark myself, to finally conclude whether
 Kafka is good for low-latency applications.
 
-Simple one node + fast consumer scenario
-Slow consumer scenario to trigger disk writes
-latencies on node failovers
-durable vs non-durable
+## What is measured
+
+Latency test intent is to test following scenarios:
+1. Messages are consumed one by one
+1. Messages are sent with light throughput of 200 messages/second
+1. Messages are sent with moderate throughput of 1000 messages/second
+
+All 3 scenarios are tested with broker/clients on:
+1. default settings with durable messages
+1. tuned for latency + durable 
+1. tuned for latency + non-durable
+
+This test do not measure latency drops due to cluster node failovers as 
+these scenarios are very different for Artemis and Kafka. Hopefully node failures
+are not part of your normal day-to-day operations ;)
+
+As usual, all code can be found [here](TODO link), if you want to play around 
+and test how your setup compares.
+
+_Disclaimer!_ I have more experience in tuning Kafka than Artemis, so if I
+forget about some quirky setting, please let me know in comment below! 
+
+
+
 commit at read and replication at write impact
+8 rides + 1.5
 
-6 rides + 1.5
 
-
-Every time I see an ExecutorService with 400 threads, I have that "it's
-not ok" feeling (high-five anyone?). This is usually introduced as
-necessary evil to retain application responsiveness while being blocked
-by downstream. However there is another way of achieving responsiveness
-without spinning up expensive OS-level threads.
-
-Let's consider a ["spherical example in vacuum"](
-https://en.wikipedia.org/wiki/Spherical_cow) here. BTW, all code can be
-found [here](https://github.com/romanmarkunas/blog-fibers-intro).
 
 ## Slow service for testing purposes
 
