@@ -1,4 +1,4 @@
-package com.romanmarkunas.blog.queues.latency.test;
+package com.romanmarkunas.blog.queues.latency.benchmark;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.SlidingWindowReservoir;
@@ -13,7 +13,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class LatencyTest {
+public class LatencyMeasurement {
 
     private final int messagesToSend;
     private final MessageSender sender;
@@ -26,7 +26,7 @@ public class LatencyTest {
     private final AtomicBoolean executionFinished = new AtomicBoolean(false);
 
 
-    public LatencyTest(
+    public LatencyMeasurement(
             int messagesToSend,
             MessageSender sender,
             MessageReceiver receiver,
