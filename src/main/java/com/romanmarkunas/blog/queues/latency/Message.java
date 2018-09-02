@@ -11,7 +11,7 @@ public class Message {
 
     public Message(String randomString) {
         this.content = randomString;
-        this.creationTime = System.currentTimeMillis();
+        this.creationTime = now();
     }
 
     @JsonCreator
@@ -24,10 +24,19 @@ public class Message {
 
 
     public String getContent() {
-        return content;
+        return this.content;
     }
 
     public long getCreationTime() {
         return creationTime;
+    }
+
+    public long timeSinceCreationNs() {
+        return now() - this.creationTime;
+    }
+
+
+    private long now() {
+        return System.nanoTime();
     }
 }

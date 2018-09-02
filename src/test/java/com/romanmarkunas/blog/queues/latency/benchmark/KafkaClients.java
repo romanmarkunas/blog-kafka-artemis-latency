@@ -9,6 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.Config;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -18,7 +19,7 @@ import static java.util.Collections.singletonList;
 
 public class KafkaClients {
 
-    private static final String TOPIC = "latency-test-1";
+    private static final String TOPIC = "latency-test-10";
     private static final String GROUP = "latency-test-group";
     private static final String BROKER = "localhost:9092";
 
@@ -43,6 +44,8 @@ public class KafkaClients {
         props.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 MessageSerde.MessageDeserializer.class.getName());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         KafkaConsumer<String, Message> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(singletonList(TOPIC));
         return new KafkaMessageReceiver(consumer, TOPIC);

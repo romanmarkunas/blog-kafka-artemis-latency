@@ -34,9 +34,25 @@ forget about some quirky setting, please let me know in comment below!
 
 
 
-commit at read and replication at write impact
+commit at read (synchronous commit increase 1 record read 75 percentile
+from 4 ms to 7 ms when timeout is 1 ms) and replication at write impact
 8 rides + 1.5
 
+at certain range smaller poll timeout with Kafka increases percentile, but
+decreases maximum latencies.
+
+max 1300 latency on default setting? that's usually 1 outlier.
+
+compare how kafka and artemis are easy to configure and total feel, e.g.
+kafka feels like is controlled from settings and code must embbrace it
+
+timeout on consumer is only if no records are available!! what is fetch interval then?
+
+describe how each optimization option helps
+
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+.\bin\windows\kafka-consumer-groups.bat --describe --bootstrap-server localhost:9092 --group latency-test-group
 
 
 ## Slow service for testing purposes

@@ -13,6 +13,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.String.format;
+
 public class LatencyMeasurement {
 
     private final int messagesToSend;
@@ -48,12 +50,6 @@ public class LatencyMeasurement {
 
 
     private Runnable send() {
-//        return runUntilDoneOrFailed(() -> {
-//            for (int i = 0; i < this.messagesToSend; i++) {
-//                Message message = new Message(this.generator.next());
-//                this.sender.sendMessage(message);
-//            }
-//        });
         return () -> {
             for (int i = 0; i < this.messagesToSend; i++) {
                 Message message = new Message(this.generator.next());
@@ -78,11 +74,8 @@ public class LatencyMeasurement {
 
                 messagesReceived++;
                 Message message = maybeMessage.get();
-
-                long latency = System.currentTimeMillis() - message.getCreationTime();
-                this.latencies.update(latency);
+                this.latencies.update(message.timeSinceCreationNs());
             }
-            System.out.println("MESSAGES RECEIVED: " + messagesReceived);
         });
     }
 
@@ -113,11 +106,12 @@ public class LatencyMeasurement {
 
     private void printResults() {
         Snapshot snap = this.latencies.getSnapshot();
+        double toMillis = 1_000_000;
         System.out.println("Test complete! Measurements: ");
         System.out.println("Total events  - " + snap.getValues().length);
-        System.out.println("99 percentile - " + snap.get99thPercentile());
-        System.out.println("75 percentile - " + snap.get75thPercentile());
-        System.out.println("Max latency   - " + snap.getMax());
-        System.out.println("Avg latency   - " + snap.getMean());
+        System.out.println(format("99 percentile - %.6f", snap.get99thPercentile() / toMillis));
+        System.out.println(format("75 percentile - %.6f", snap.get75thPercentile() / toMillis));
+        System.out.println(format("Max latency   - %.6f", snap.getMax() / toMillis));
+        System.out.println(format("Avg latency   - %.6f", snap.getMean() / toMillis));
     }
 }

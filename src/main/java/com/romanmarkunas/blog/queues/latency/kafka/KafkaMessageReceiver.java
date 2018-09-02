@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.temporal.ChronoUnit.MICROS;
 import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class KafkaMessageReceiver implements MessageReceiver, AutoCloseable {
@@ -19,6 +20,7 @@ public class KafkaMessageReceiver implements MessageReceiver, AutoCloseable {
     private final Consumer<String, Message> consumer;
     private final String topic;
     private final List<Message> prefetchBuffer = new ArrayList<>();
+    private int timeoutMs = 10_000;
 
 
     public KafkaMessageReceiver(Consumer<String, Message> consumer, String topic) {
@@ -31,7 +33,7 @@ public class KafkaMessageReceiver implements MessageReceiver, AutoCloseable {
     public Optional<Message> receiveMessage() {
         if (this.prefetchBuffer.isEmpty()) {
             ConsumerRecords<String, Message> consumerRecords
-                    = this.consumer.poll(Duration.of(10, MILLIS));
+                    = this.consumer.poll(Duration.of(this.timeoutMs, MILLIS));
             Iterator<ConsumerRecord<String, Message>> recordIterator
                     = consumerRecords.records(this.topic).iterator();
 
@@ -39,6 +41,7 @@ public class KafkaMessageReceiver implements MessageReceiver, AutoCloseable {
                 return Optional.empty();
             }
             else {
+//                this.consumer.commitSync();
                 Message returningNow = recordIterator.next().value();
                 while (recordIterator.hasNext()) {
                     this.prefetchBuffer.add(recordIterator.next().value());

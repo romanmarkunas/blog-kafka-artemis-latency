@@ -13,7 +13,7 @@ public class LatencyBenchmark {
     @Test
     public void send_10000_256bytes_unlimitedRate() {
         new LatencyMeasurement(
-                5_000,
+                1000,
                 KafkaClients.defaultSender(),
                 KafkaClients.defaultReceiver(),
                 new StringGenerator(StringGenerator.ALPHANUM, 128)
