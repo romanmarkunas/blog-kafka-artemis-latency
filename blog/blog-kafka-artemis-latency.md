@@ -54,6 +54,10 @@ describe how each optimization option helps
 .\bin\windows\kafka-server-start.bat .\config\server.properties
 .\bin\windows\kafka-consumer-groups.bat --describe --bootstrap-server localhost:9092 --group latency-test-group
 
+Either will do for most cases, just don't make the zoo. My opinion:
+a man who knows how to use a knife with a dull knife is better than a 
+man who has no clue with 5 sharp knifes. Latter will probably just cut 
+himself
 
 ## Slow service for testing purposes
 

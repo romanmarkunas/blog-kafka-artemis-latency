@@ -2,21 +2,22 @@ package com.romanmarkunas.blog.queues.latency.artemis;
 
 import com.romanmarkunas.blog.queues.latency.Message;
 import com.romanmarkunas.blog.queues.latency.MessageSender;
-import org.apache.activemq.artemis.api.core.ActiveMQException;
-import org.apache.activemq.artemis.api.core.client.ClientMessage;
-import org.apache.activemq.artemis.api.core.client.ClientProducer;
-import org.apache.activemq.artemis.api.core.client.ClientSession;
+
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
 public class ArtemisMessageSender implements MessageSender, AutoCloseable {
 
-    private final ClientProducer producer;
-    private final ClientSession session;
+    private final MessageProducer producer;
+    private final Session session;
     private final MessageSerde.MessageSerializer serializer;
 
 
     public ArtemisMessageSender(
-            ClientProducer producer,
-            ClientSession session,
+            MessageProducer producer,
+            Session session,
             MessageSerde.MessageSerializer serializer) {
         this.producer = producer;
         this.session = session;
@@ -26,12 +27,12 @@ public class ArtemisMessageSender implements MessageSender, AutoCloseable {
 
     @Override
     public void sendMessage(Message message) {
-        ClientMessage artemisMessage = this.session.createMessage(true);
-        this.serializer.storeToBuffer(message, artemisMessage);
         try {
+            TextMessage artemisMessage = this.session.createTextMessage();
+            artemisMessage.setText(this.serializer.serialize(message));
             this.producer.send(artemisMessage);
         }
-        catch (ActiveMQException e) {
+        catch (JMSException e) {
             throw new RuntimeException("Failed to send message!", e);
         }
     }

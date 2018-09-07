@@ -19,4 +19,14 @@ public class LatencyBenchmark {
                 new StringGenerator(StringGenerator.ALPHANUM, 128)
         ).run();
     }
+
+    @Test
+    public void send_1000_256bytes_unlimitedRate_artemis() {
+        new LatencyMeasurement(
+                1000,
+                ArtemisClients.defaultSender(),
+                ArtemisClients.defaultReceiver(),
+                new StringGenerator(StringGenerator.ALPHANUM, 128)
+        ).run();
+    }
 }

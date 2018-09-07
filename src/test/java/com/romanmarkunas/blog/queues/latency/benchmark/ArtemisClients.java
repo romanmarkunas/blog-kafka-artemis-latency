@@ -1,52 +1,89 @@
 package com.romanmarkunas.blog.queues.latency.benchmark;
 
-import com.romanmarkunas.blog.queues.latency.Message;
-import com.romanmarkunas.blog.queues.latency.kafka.KafkaMessageReceiver;
-import com.romanmarkunas.blog.queues.latency.kafka.KafkaMessageSender;
-import com.romanmarkunas.blog.queues.latency.kafka.MessageSerde;
-import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.common.serialization.StringDeserializer;
+import com.romanmarkunas.blog.queues.latency.artemis.ArtemisMessageReceiver;
+import com.romanmarkunas.blog.queues.latency.artemis.ArtemisMessageSender;
+import com.romanmarkunas.blog.queues.latency.artemis.MessageSerde;
 
-import java.util.Properties;
-
-import static java.util.Collections.singletonList;
+import javax.jms.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.Hashtable;
 
 public class ArtemisClients {
 
-//    public static void
-
     private ArtemisClients() {}
 
-    private static final String TOPIC = "latency-test";
-    private static final String GROUP = "latency-test-group";
-    private static final String BROKER = "localhost";
+    private static final String QUEUE = "queue/latency-test";
+    private static final String BROKER = "tcp://127.0.0.1:61616";
 
-    public static KafkaMessageSender defaultSender() {
-        Properties props = minimalConfig();
-        KafkaProducer<String, Message> producer = new KafkaProducer<>(props);
-        return new KafkaMessageSender(producer, TOPIC);
+    public static ArtemisMessageSender defaultSender() {
+        try {
+            SessionAndQueueAndConnection jmsObjects = lookupJmsObjects();
+
+            Session session = jmsObjects.session;
+            MessageProducer producer = session.createProducer(jmsObjects.queue);
+            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            jmsObjects.connection.start();
+
+            return new ArtemisMessageSender(
+                    producer,
+                    session,
+                    new MessageSerde.MessageSerializer()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static KafkaMessageReceiver defaultReceiver() {
-        Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP);
-        props.put(
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class.getName());
-        props.put(
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                MessageSerde.MessageDeserializer.class.getName());
-        KafkaConsumer<String, Message> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(singletonList(TOPIC));
-        return new KafkaMessageReceiver(consumer, TOPIC);
+    public static ArtemisMessageReceiver defaultReceiver() {
+        try {
+            SessionAndQueueAndConnection jmsObjects = lookupJmsObjects();
+
+            Session session = jmsObjects.session;
+            MessageConsumer consumer = session.createConsumer(jmsObjects.queue);
+            jmsObjects.connection.start();
+
+            return new ArtemisMessageReceiver(
+                    consumer,
+                    new MessageSerde.MessageDeserializer()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static Properties minimalConfig() {
-        Properties props = new Properties();
-        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, BROKER);
-        return props;
+    public static SessionAndQueueAndConnection lookupJmsObjects() throws NamingException, JMSException {
+        Hashtable<String, Object> props = new Hashtable<>();
+        props.put(
+                Context.INITIAL_CONTEXT_FACTORY,
+                "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
+        props.put(
+                "connectionFactory.ConnectionFactory",
+                BROKER);
+
+        InitialContext initialContext = new InitialContext(props);
+        ConnectionFactory factory
+                = (ConnectionFactory) initialContext.lookup("ConnectionFactory");
+        Connection connection = factory.createConnection();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Queue queue = session.createQueue(QUEUE);
+        return new SessionAndQueueAndConnection(session, queue, connection);
+    }
+
+    private static class SessionAndQueueAndConnection {
+
+        private final Session session;
+        private final Queue queue;
+        private final Connection connection;
+
+        public SessionAndQueueAndConnection(
+                Session session,
+                Queue queue,
+                Connection connection) {
+            this.session = session;
+            this.queue = queue;
+            this.connection = connection;
+        }
     }
 }
