@@ -5,7 +5,7 @@ for throughput". That's fair and you can find plenty of benchmarks that show
 700k/s throughput for single producer without replication. But does that mean
 we should discard Kafka when talking about low latency messaging? 
 
-After quick Google'ing I found [this outdated SO question](https://stackoverflow.com/questions/20520492/how-to-minimize-the-latency-involved-in-kafka-messaging-framework).
+After quick googling I found [this outdated SO question](https://stackoverflow.com/questions/20520492/how-to-minimize-the-latency-involved-in-kafka-messaging-framework).
 That question is very old and includes very old version of Kafka (0.7.2 whereas
 current version is 2.0.0) and also [this article](TODO link) 
 states that very decent latencies (2-3ms 99 percentile) are achievable. Having 
