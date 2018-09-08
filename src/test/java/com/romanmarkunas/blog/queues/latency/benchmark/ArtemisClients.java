@@ -14,7 +14,7 @@ public class ArtemisClients {
 
     private ArtemisClients() {}
 
-    private static final String QUEUE = "queue/latency-test";
+    private static final String QUEUE = "queue/latency-test-1";
     private static final String BROKER = "tcp://127.0.0.1:61616";
 
     public static ArtemisMessageSender defaultSender() {

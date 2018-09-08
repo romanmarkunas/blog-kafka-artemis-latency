@@ -11,22 +11,26 @@ public class LatencyBenchmark {
 //                            "org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory"));
 
     @Test
-    public void send_10000_256bytes_unlimitedRate() {
+    public void send_1000_256bytes_200ps_kafka() {
         new LatencyMeasurement(
                 1000,
-                KafkaClients.defaultSender(),
+                200.0,
                 KafkaClients.defaultReceiver(),
-                new StringGenerator(StringGenerator.ALPHANUM, 128)
+                KafkaClients.defaultSender(),
+                new StringGenerator(StringGenerator.ALPHANUM, 128),
+                "Kafka default 200 messages/s"
         ).run();
     }
 
     @Test
-    public void send_1000_256bytes_unlimitedRate_artemis() {
+    public void send_1000_256bytes_200ps_artemis() {
         new LatencyMeasurement(
                 1000,
-                ArtemisClients.defaultSender(),
+                200.0,
                 ArtemisClients.defaultReceiver(),
-                new StringGenerator(StringGenerator.ALPHANUM, 128)
+                ArtemisClients.defaultSender(),
+                new StringGenerator(StringGenerator.ALPHANUM, 128),
+                "Artemis default 200 messages/s"
         ).run();
     }
 }
