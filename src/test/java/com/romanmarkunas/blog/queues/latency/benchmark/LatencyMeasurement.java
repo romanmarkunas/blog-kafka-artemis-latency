@@ -5,7 +5,9 @@ import com.romanmarkunas.blog.queues.latency.*;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.String.format;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
@@ -20,9 +22,9 @@ public class LatencyMeasurement {
     private final String label;
 
     private final Histogram latencies;
-    private final ScheduledExecutorService producerPool = newScheduledThreadPool(2);
+    private final ScheduledExecutorService producerPool = newScheduledThreadPool(1);
 
-    private volatile Meter producerRateMeter = null;
+    private Meter producerRateMeter;
 
 
     public LatencyMeasurement(
@@ -32,6 +34,13 @@ public class LatencyMeasurement {
             MessageSender sender,
             StringGenerator generator,
             String label) {
+        if (ratePerSecond < 0.5 || ratePerSecond > 20001.0) {
+            throw new IllegalArgumentException(
+                    "Measurement code was not designed for rates below 0,5Hz "
+                  + "and above 20KHz. Please change code and remove this check"
+                  + "to test with such unsupported rates.");
+        }
+
         this.messagesToSend = messagesToSend;
         this.sender = sender;
         this.receiver = receiver;
@@ -44,7 +53,8 @@ public class LatencyMeasurement {
 
     public void run() {
         // warm-up run
-        sendAndReceive(200, false);
+        sendAndReceive((int) (this.messagesToSend * 0.4), false);
+        this.producerRateMeter = new Meter();
         // actual measurement
         sendAndReceive(this.messagesToSend, true);
         printResults();
@@ -52,42 +62,30 @@ public class LatencyMeasurement {
 
 
     private void sendAndReceive(int totalMessages, boolean metered) {
-        scheduleNextAndSend(totalMessages, metered);
+        AtomicInteger moreToSend = new AtomicInteger(totalMessages);
+        ScheduledFuture future = this.producerPool.scheduleAtFixedRate(
+                () -> sendRoutine(moreToSend, metered),
+                0,
+                nsDelayFromRate(),
+                TimeUnit.NANOSECONDS
+        );
         receiveRoutine(totalMessages, metered);
+        future.cancel(true);
     }
 
-    private void scheduleNextAndSend(int moreToSend, boolean metered) {
-        if (moreToSend > 1) {
-            this.producerPool.schedule(
-                    () -> scheduleNextAndSend(moreToSend - 1, metered),
-                    nsDelayFromRate(),
-                    TimeUnit.NANOSECONDS);
-        }
+    private void sendRoutine(AtomicInteger moreToSend, boolean metered) {
+        if (moreToSend.getAndDecrement() > 0) {
+            Message message = new Message(this.generator.next());
+            this.sender.sendMessage(message);
 
-        Message message = new Message(this.generator.next());
-        this.sender.sendMessage(message);
-
-        if (metered) {
-            markProducerRate();
-        }
-
-        if (moreToSend <= 1) {
-            System.out.println("COUNT: " + this.producerRateMeter.getCount());
-            System.out.println("RATE: " + this.producerRateMeter.getMeanRate());
-            System.out.println("RATE: " + this.producerRateMeter.getOneMinuteRate());
+            if (metered) {
+                this.producerRateMeter.mark();
+            }
         }
     }
 
     private long nsDelayFromRate() {
         return (long) ((1.0d / this.ratePerSecond) * 1_000_000_000);
-    }
-
-    private void markProducerRate() {
-        if (this.producerRateMeter == null) {
-            this.producerRateMeter = new Meter();
-        }
-
-        this.producerRateMeter.mark();
     }
 
     private void receiveRoutine(int totalToReceive, boolean metered) {
