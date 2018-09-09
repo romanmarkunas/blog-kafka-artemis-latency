@@ -1,5 +1,8 @@
 package com.romanmarkunas.blog.queues.latency;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class StringGenerator {
 
     public static final String ALPHANUM
@@ -10,7 +13,7 @@ public class StringGenerator {
     private final String charset;
     private final int stringSize;
 
-    private int offset = 0;
+    private final Map<String, Integer> offsets = new HashMap<>();
 
 
     public StringGenerator(String charset, int stringSize) {
@@ -19,33 +22,47 @@ public class StringGenerator {
     }
 
 
+    /**
+     * Generates string from given charset. Thread-safe, if all accessing
+     * threads have unique names
+     */
     public String next() {
+        String currentThread = Thread.currentThread().getName();
+        int offset = getOffsetFor(currentThread);
+
         StringBuilder stringBuilder = new StringBuilder();
         int moreCharacters = this.stringSize;
 
         while (moreCharacters > 0) {
-            stringBuilder.append(this.charset.charAt(this.offset));
+            stringBuilder.append(this.charset.charAt(offset));
             moreCharacters--;
-            incrementOffset();
+            offset = incremented(offset);
         }
 
-        avoidCharsetCopies();
+        offset = maybeIncrementToAvoidCopies(offset);
+        storeOffsetFor(currentThread, offset);
 
         return stringBuilder.toString();
     }
 
 
-    private void incrementOffset() {
-        this.offset++;
-
-        if (this.offset >= this.charset.length()) {
-            this.offset = 0;
-        }
+    private int getOffsetFor(String threadName) {
+        Integer offset = this.offsets.get(threadName);
+        return offset == null ? 0 : offset;
     }
 
-    private void avoidCharsetCopies() {
-        if (this.stringSize == this.charset.length()) {
-            incrementOffset();
-        }
+    private void storeOffsetFor(String threadName, int offset) {
+        this.offsets.put(threadName, offset);
+    }
+
+    private int incremented(int offset) {
+        offset += 1;
+        return offset >= this.charset.length() ? 0 : offset;
+    }
+
+    private int maybeIncrementToAvoidCopies(int offset) {
+        return this.stringSize == this.charset.length()
+                ? incremented(offset)
+                : offset;
     }
 }
