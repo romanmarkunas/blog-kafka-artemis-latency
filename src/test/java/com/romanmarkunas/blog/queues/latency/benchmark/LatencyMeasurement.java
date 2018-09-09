@@ -24,6 +24,7 @@ public class LatencyMeasurement {
     private final Histogram latencies;
     private final ScheduledExecutorService producerPool = newScheduledThreadPool(1);
 
+    // not volatile because it's initialized before other threads ever access it
     private Meter producerRateMeter;
 
 
@@ -54,8 +55,8 @@ public class LatencyMeasurement {
     public void run() {
         // warm-up run
         sendAndReceive((int) (this.messagesToSend * 0.4), false);
-        this.producerRateMeter = new Meter();
         // actual measurement
+        this.producerRateMeter = new Meter();
         sendAndReceive(this.messagesToSend, true);
         printResults();
     }

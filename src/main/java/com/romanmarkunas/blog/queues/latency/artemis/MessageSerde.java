@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanmarkunas.blog.queues.latency.Message;
 import org.apache.kafka.common.errors.SerializationException;
 
-import javax.jms.JMSException;
-import javax.jms.TextMessage;
 import java.io.IOException;
 
 public class MessageSerde {
@@ -27,11 +25,11 @@ public class MessageSerde {
 
     public static class MessageDeserializer {
 
-        public Message deserialize(TextMessage artemisMessage) {
+        public Message deserialize(String artemisMessage) {
             try {
-                return mapper.readValue(artemisMessage.getText(), Message.class);
+                return mapper.readValue(artemisMessage, Message.class);
             }
-            catch (IOException | JMSException e) {
+            catch (IOException e) {
                 throw new SerializationException("Unable to deserialize message!", e);
             }
         }

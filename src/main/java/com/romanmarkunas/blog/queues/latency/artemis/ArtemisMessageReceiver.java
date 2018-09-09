@@ -31,7 +31,8 @@ public class ArtemisMessageReceiver implements MessageReceiver, AutoCloseable {
                 return Optional.empty();
             }
             else {
-                return Optional.of(this.deserializer.deserialize(artemisMessage));
+                String message = artemisMessage.getText();
+                return Optional.of(this.deserializer.deserialize(message));
             }
         }
         catch (JMSException e) {

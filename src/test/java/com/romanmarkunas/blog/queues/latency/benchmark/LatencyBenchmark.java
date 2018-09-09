@@ -1,6 +1,7 @@
 package com.romanmarkunas.blog.queues.latency.benchmark;
 
 import com.romanmarkunas.blog.queues.latency.StringGenerator;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class LatencyBenchmark {
@@ -11,6 +12,7 @@ public class LatencyBenchmark {
 //                            "org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory"));
 
     @Test
+    @Ignore
     public void send_1000_256bytes_200ps_kafka() {
         new LatencyMeasurement(
                 1000,
@@ -23,6 +25,7 @@ public class LatencyBenchmark {
     }
 
     @Test
+    @Ignore
     public void send_1000_256bytes_200ps_artemis() {
         new LatencyMeasurement(
                 1000,
