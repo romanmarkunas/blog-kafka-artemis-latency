@@ -2,7 +2,6 @@ package com.romanmarkunas.blog.queues.latency.benchmark;
 
 import com.romanmarkunas.blog.queues.latency.artemis.ArtemisMessageReceiver;
 import com.romanmarkunas.blog.queues.latency.artemis.ArtemisMessageSender;
-import com.romanmarkunas.blog.queues.latency.artemis.MessageSerde;
 
 import javax.jms.*;
 import javax.naming.Context;
@@ -26,11 +25,7 @@ public class ArtemisClients {
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
             jmsObjects.connection.start();
 
-            return new ArtemisMessageSender(
-                    producer,
-                    session,
-                    new MessageSerde.MessageSerializer()
-            );
+            return new ArtemisMessageSender(producer, session);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -44,10 +39,7 @@ public class ArtemisClients {
             MessageConsumer consumer = session.createConsumer(jmsObjects.queue);
             jmsObjects.connection.start();
 
-            return new ArtemisMessageReceiver(
-                    consumer,
-                    new MessageSerde.MessageDeserializer()
-            );
+            return new ArtemisMessageReceiver(consumer);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

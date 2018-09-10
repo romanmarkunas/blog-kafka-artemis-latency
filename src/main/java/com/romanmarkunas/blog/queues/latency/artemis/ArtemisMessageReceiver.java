@@ -1,24 +1,24 @@
 package com.romanmarkunas.blog.queues.latency.artemis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanmarkunas.blog.queues.latency.Message;
 import com.romanmarkunas.blog.queues.latency.MessageReceiver;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
+import java.io.IOException;
 import java.util.Optional;
 
 public class ArtemisMessageReceiver implements MessageReceiver, AutoCloseable {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     private final MessageConsumer consumer;
-    private final MessageSerde.MessageDeserializer deserializer;
 
 
-    public ArtemisMessageReceiver(
-            MessageConsumer consumer,
-            MessageSerde.MessageDeserializer deserializer) {
+    public ArtemisMessageReceiver(MessageConsumer consumer) {
         this.consumer = consumer;
-        this.deserializer = deserializer;
     }
 
 
@@ -32,10 +32,10 @@ public class ArtemisMessageReceiver implements MessageReceiver, AutoCloseable {
             }
             else {
                 String message = artemisMessage.getText();
-                return Optional.of(this.deserializer.deserialize(message));
+                return Optional.of(mapper.readValue(message, Message.class));
             }
         }
-        catch (JMSException e) {
+        catch (JMSException | IOException e) {
             throw new RuntimeException("Called receive on closed client!", e);
         }
     }
