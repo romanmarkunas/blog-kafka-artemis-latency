@@ -12,7 +12,7 @@ public class KafkaMessageSender implements MessageSender, AutoCloseable {
     private final Producer<String, Message> producer;
     private final String topic;
 
-    // TODO - test these 2 guys
+
     public KafkaMessageSender(Producer<String, Message> producer, String topic) {
         this.producer = producer;
         this.topic = topic;

@@ -9,14 +9,19 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Hashtable;
 
-public class ArtemisClients {
+class ArtemisClientsFactory {
 
-    private ArtemisClients() {}
+    private static final String QUEUE = "queue/latency-test";
 
-    private static final String QUEUE = "queue/latency-test-1";
-    private static final String BROKER = "tcp://127.0.0.1:61616";
+    private final String broker;
 
-    public static ArtemisMessageSender defaultSender() {
+
+    ArtemisClientsFactory(String broker) {
+        this.broker = broker;
+    }
+
+
+    ArtemisMessageSender defaultSender() {
         try {
             SessionAndQueueAndConnection jmsObjects = lookupJmsObjects();
 
@@ -31,7 +36,7 @@ public class ArtemisClients {
         }
     }
 
-    public static ArtemisMessageReceiver defaultReceiver() {
+    ArtemisMessageReceiver defaultReceiver() {
         try {
             SessionAndQueueAndConnection jmsObjects = lookupJmsObjects();
 
@@ -45,14 +50,15 @@ public class ArtemisClients {
         }
     }
 
-    public static SessionAndQueueAndConnection lookupJmsObjects() throws NamingException, JMSException {
+
+    private SessionAndQueueAndConnection lookupJmsObjects() throws NamingException, JMSException {
         Hashtable<String, Object> props = new Hashtable<>();
         props.put(
                 Context.INITIAL_CONTEXT_FACTORY,
                 "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
         props.put(
                 "connectionFactory.ConnectionFactory",
-                BROKER);
+                this.broker);
 
         InitialContext initialContext = new InitialContext(props);
         ConnectionFactory factory
@@ -62,6 +68,7 @@ public class ArtemisClients {
         Queue queue = session.createQueue(QUEUE);
         return new SessionAndQueueAndConnection(session, queue, connection);
     }
+
 
     private static class SessionAndQueueAndConnection {
 
