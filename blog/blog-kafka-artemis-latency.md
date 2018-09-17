@@ -36,14 +36,52 @@ explanation why these settings were used.
 
 ## Results
 
+Lowest latency possible:
+
+Measurement of Kafka low latency 200 messages/s complete!
+
+Total sent     - 5000
+Total received - 5000
+Send rate      - 200.004
+99 percentile  - 1.576891
+75 percentile  - 1.180825
+Min latency    - 0.593806
+Max latency    - 8.921906
+Avg latency    - 1.085105
+===============================================
+
+Measurement of Kafka commit after each message 200 messages/s complete!
+
+Total sent     - 5000
+Total received - 5000
+Send rate      - 200.004
+99 percentile  - 4.535680
+75 percentile  - 1.927668
+Min latency    - 0.904814
+Max latency    - 9.848230
+Avg latency    - 1.865007
+===============================================
+
+Measurement of Kafka low latency 4000 messages/s complete!
+
+Total sent     - 50000
+Total received - 50000
+Send rate      - 3837.725
+99 percentile  - 1.327242
+75 percentile  - 0.945013
+Min latency    - 0.413972
+Max latency    - 13.287300
+Avg latency    - 0.802173
+===============================================
+
 commit at read (synchronous commit increase 1 record read 75 percentile
 from 4 ms to 7 ms when timeout is 1 ms) and replication at write impact
 8 rides + 1.5
 
+Kafka spikes are e.g. offset removal ~7ms
+
 at certain range smaller poll timeout with Kafka increases percentile, but
 decreases maximum latencies.
-
-max 1300 latency on default setting? that's usually 1 outlier.
 
 compare how kafka and artemis are easy to configure and total feel, e.g.
 kafka feels like is controlled from settings and code must embbrace it

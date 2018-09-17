@@ -19,14 +19,40 @@ public class LatencyBenchmark {
 
     @Test
     @Ignore
-    public void send_5000_256bytes_200ps_kafka() {
+    public void send_200ps_lowestLatencyPossible_kafka() {
         new LatencyMeasurement(
-                1000,
+                5000,
                 200.0,
                 kafkaClientsLowLatency.lowLatencyReceiver(),
                 kafkaClientsLowLatency.lowLatencySender(),
                 generator,
                 "Kafka low latency 200 messages/s"
+        ).run();
+    }
+
+    @Test
+    @Ignore
+    public void send_200ps_commitAfterEach_kafka() {
+        new LatencyMeasurement(
+                5000,
+                200.0,
+                kafkaClientsLowLatency.lowLatencyFaultTolerantReceiver(),
+                kafkaClientsLowLatency.lowLatencySender(),
+                generator,
+                "Kafka commit after each message 200 messages/s"
+        ).run();
+    }
+
+    @Test
+    @Ignore
+    public void send_4000ps_lowestLatencyPossible_kafka() {
+        new LatencyMeasurement(
+                50000,
+                4000.0,
+                kafkaClientsLowLatency.lowLatencyReceiver(),
+                kafkaClientsLowLatency.lowLatencySender(),
+                generator,
+                "Kafka low latency 4000 messages/s"
         ).run();
     }
 

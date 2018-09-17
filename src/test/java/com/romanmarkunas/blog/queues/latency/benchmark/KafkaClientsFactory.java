@@ -18,7 +18,7 @@ import static java.util.Collections.singletonList;
 
 class KafkaClientsFactory {
 
-    private static final String TOPIC = "latency-test";
+    private static final String TOPIC = "latency-test-42";
     private static final String GROUP = "latency-test-group";
 
     private final String broker;
