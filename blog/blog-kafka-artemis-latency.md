@@ -74,6 +74,45 @@ Max latency    - 13.287300
 Avg latency    - 0.802173
 ===============================================
 
+3 broker nodes + commit after each read
+Measurement of Kafka fault tolerant message 200 messages/s complete!
+
+Total sent     - 5000
+Total received - 5000
+Send rate      - 199.989
+99 percentile  - 5.137226
+75 percentile  - 3.924183
+Min latency    - 2.115347
+Max latency    - 14.580346
+Avg latency    - 3.613249
+===============================================
+
+Rate is not 4K with tese latencies obvs
+Measurement of Kafka fault tolerant message 4000 messages/s complete!
+
+Total sent     - 50000
+Total received - 50000
+Send rate      - 632.051
+99 percentile  - 5.121739
+75 percentile  - 3.679203
+Min latency    - 1.930928
+Max latency    - 26.264651
+Avg latency    - 3.397053
+===============================================
+
+but if I allow batching this happens:
+Measurement of Kafka fault tolerant message 4000 messages/s complete!
+
+Total sent     - 50000
+Total received - 50000
+Send rate      - 3993.356
+99 percentile  - 17.898772
+75 percentile  - 11.823148
+Min latency    - 5.039950
+Max latency    - 35.926347
+Avg latency    - 11.018564
+===============================================
+
 commit at read (synchronous commit increase 1 record read 75 percentile
 from 4 ms to 7 ms when timeout is 1 ms) and replication at write impact
 8 rides + 1.5

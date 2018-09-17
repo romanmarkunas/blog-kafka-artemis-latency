@@ -11,7 +11,7 @@ public class LatencyBenchmark {
     private static final StringGenerator generator
             = new StringGenerator(StringGenerator.ALPHANUM, MESSAGE_SIZE_BYTES / 2);
 
-    private static final KafkaClientsFactory kafkaClientsLowLatency
+    private static final KafkaClientsFactory kafkaClients
             = new KafkaClientsFactory("localhost:9092");
     private static final ArtemisClientsFactory artemisClientLowLatency
             = new ArtemisClientsFactory("tcp://127.0.0.1:61616");
@@ -23,8 +23,8 @@ public class LatencyBenchmark {
         new LatencyMeasurement(
                 5000,
                 200.0,
-                kafkaClientsLowLatency.lowLatencyReceiver(),
-                kafkaClientsLowLatency.lowLatencySender(),
+                kafkaClients.lowLatencyReceiver(),
+                kafkaClients.lowLatencySender(),
                 generator,
                 "Kafka low latency 200 messages/s"
         ).run();
@@ -36,8 +36,8 @@ public class LatencyBenchmark {
         new LatencyMeasurement(
                 5000,
                 200.0,
-                kafkaClientsLowLatency.lowLatencyFaultTolerantReceiver(),
-                kafkaClientsLowLatency.lowLatencySender(),
+                kafkaClients.lowLatencyFaultTolerantReceiver(),
+                kafkaClients.lowLatencySender(),
                 generator,
                 "Kafka commit after each message 200 messages/s"
         ).run();
@@ -49,10 +49,37 @@ public class LatencyBenchmark {
         new LatencyMeasurement(
                 50000,
                 4000.0,
-                kafkaClientsLowLatency.lowLatencyReceiver(),
-                kafkaClientsLowLatency.lowLatencySender(),
+                kafkaClients.lowLatencyReceiver(),
+                kafkaClients.lowLatencySender(),
                 generator,
                 "Kafka low latency 4000 messages/s"
+        ).run();
+    }
+
+    @Test
+    @Ignore
+    public void send_200ps_faultTolerant_kafka() {
+        new LatencyMeasurement(
+                5000,
+                200.0,
+                kafkaClients.lowLatencyFaultTolerantReceiver(),
+                kafkaClients.lowLatencyFaultTolerantSender(),
+                generator,
+                "Kafka fault tolerant message 200 messages/s"
+        ).run();
+    }
+
+
+    @Test
+    @Ignore
+    public void send_4000ps_faultTolerant_kafka() {
+        new LatencyMeasurement(
+                50000,
+                4000.0,
+                kafkaClients.lowLatencyFaultTolerantReceiver(),
+                kafkaClients.lowLatencyFaultTolerantSender(),
+                generator,
+                "Kafka fault tolerant message 4000 messages/s"
         ).run();
     }
 

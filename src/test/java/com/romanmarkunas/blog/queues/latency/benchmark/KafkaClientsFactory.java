@@ -75,6 +75,7 @@ class KafkaClientsFactory {
         props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 1048576);
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "none");
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, 0);
+//        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 5000); // for replicated throughput
         props.put(ProducerConfig.LINGER_MS_CONFIG, 0);
         props.put(ProducerConfig.ACKS_CONFIG, "1");
         return props;
