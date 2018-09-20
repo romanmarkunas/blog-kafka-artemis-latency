@@ -100,9 +100,7 @@ latency, and it's roughly 30% overhead.
 
 #### Fault-tolerant setup with synchronous consumer commit
 
-3 broker nodes + commit after each read
-Measurement of Kafka fault tolerant message 200 messages/s complete!
-
+Measurements @ 200 messages/s and synchronous commit:
 Total sent     - 5000
 Total received - 5000
 Send rate      - 199.989
@@ -111,24 +109,8 @@ Send rate      - 199.989
 Min latency    - 2.115347
 Max latency    - 14.580346
 Avg latency    - 3.613249
-===============================================
 
-Rate is not 4K with tese latencies obvs
-Measurement of Kafka fault tolerant message 4000 messages/s complete!
-
-Total sent     - 50000
-Total received - 50000
-Send rate      - 632.051
-99 percentile  - 5.121739
-75 percentile  - 3.679203
-Min latency    - 1.930928
-Max latency    - 26.264651
-Avg latency    - 3.397053
-===============================================
-
-but if I allow batching this happens:
-Measurement of Kafka fault tolerant message 4000 messages/s complete!
-
+Measurements @ 4000 messages/s and synchronous commit:
 Total sent     - 50000
 Total received - 50000
 Send rate      - 3993.356
@@ -137,21 +119,23 @@ Send rate      - 3993.356
 Min latency    - 5.039950
 Max latency    - 35.926347
 Avg latency    - 11.018564
-===============================================
 
-commit at read (synchronous commit increase 1 record read 75 percentile
-from 4 ms to 7 ms when timeout is 1 ms) and replication at write impact
-8 rides + 1.5
+Fault tolerant config:
+1. Broker made out of 3 nodes
+1. Producer waits for ack from each broker node
+1. Sync to disk is still delayed
 
-
-Either will do for most cases, just don't make the zoo. My opinion:
-a man who knows how to use a knife with a dull knife is better than a 
-man who has no clue with 5 sharp knifes. Latter will probably just cut 
-himself
+For the higher throughput scenario I had to turn batching on and put a setting
+to batch at most 500 records. Otherwise maximum throughput would be 1000 /
+MIN_LATENCY = 1000 / 5 = 200 messages/s
 
 
 ## Conclusion
 
+Either will do for most cases, just don't make the zoo. My opinion:
+a man who knows how to use a knife with a dull knife is better than a
+man who has no clue with 5 sharp knifes. Latter will probably just cut
+himself
 
-
-## Overview of settings and their impact on latency
+Coming soon! Follow-up post where same tests are performed with Apache Artemis
+(formerly ActiveMQ).
