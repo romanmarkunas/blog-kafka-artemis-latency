@@ -144,14 +144,21 @@ from 4 ms to 7 ms when timeout is 1 ms) and replication at write impact
 8 rides + 1.5
 
 
-Either will do for most cases, just don't make the zoo. My opinion:
-a man who knows how to use a knife with a dull knife is better than a 
-man who has no clue with 5 sharp knifes. Latter will probably just cut 
-himself
-
-
 ## Conclusion
 
+Looks like these articles about huge latencies of 100ms magnitude relate to zgit 
+older versions of Kafka. Replicated operation showed pretty decent results,
+which should be enough for most cases. Please note that these results are not
+made on dedicated hardware and I didn't do any memory/OS settings/affinity
+tuning, so very likely it's possible to get even better results.  
 
+There are no measurements for durable messages (force flush each message on 
+disk) and I think tests for such setup are extremely hardware dependent and 
+should be made using proper HDD/SSD.
 
-## Overview of settings and their impact on latency
+My takeaway from this is that unless you need sub-millisecond latencies I 
+could do with Kafka. Unless you are in that outlier part of spectrum 
+technologies/solution selection must be done based on functionality it provides
+and not on specific performance parameters. And of course reusing well-known 
+technology is much better than having a zoo of trendy names, that barely anyone
+in team understands properly.
