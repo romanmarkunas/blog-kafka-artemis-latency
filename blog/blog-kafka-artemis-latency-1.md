@@ -132,7 +132,7 @@ MIN_LATENCY = 1000 / 5 = 200 messages/s
 
 ## Conclusion
 
-Looks like these articles about huge latencies of 100ms magnitude relate to zgit 
+Looks like these articles about huge latencies of 100ms magnitude relate to
 older versions of Kafka. Replicated operation showed pretty decent results,
 which should be enough for most cases. Please note that these results are not
 made on dedicated hardware and I didn't do any memory/OS settings/affinity
